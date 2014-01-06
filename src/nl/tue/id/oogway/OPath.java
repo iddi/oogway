@@ -184,6 +184,7 @@ public class OPath {
 
 		if (shapes.containsKey(filename)) {
 			s = shapes.get(filename);
+			//System.out.println(filename + "reloaded");
 		} else {
 
 			try {
