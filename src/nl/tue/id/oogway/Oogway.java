@@ -17,12 +17,22 @@
 
 package nl.tue.id.oogway;
 
+import static processing.core.PApplet.atan2;
+import static processing.core.PApplet.cos;
+import static processing.core.PApplet.degrees;
+import static processing.core.PApplet.pow;
+import static processing.core.PApplet.radians;
+import static processing.core.PApplet.sin;
+import static processing.core.PApplet.sqrt;
+import static processing.core.PConstants.CLOSE;
+import static processing.core.PConstants.PI;
+
 import java.util.Hashtable;
 import java.util.Vector;
 
 import processing.core.PApplet;
 import processing.core.PShape;
-import static processing.core.PApplet.*;
+import processing.core.PVector;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -87,12 +97,12 @@ public class Oogway implements Cloneable, OConstants {
 	 * x location on screen. Any change to this variable must be done using
 	 * setPosition.
 	 */
-	private float xcor;
+	private float xcor = 0.0f;
 	/**
 	 * y location on screen. Any change to this variable must be done using
 	 * setPosition.
 	 */
-	private float ycor;
+	private float ycor = 0.0f;
 
 	/**
 	 * Standard constructor, creates a Oogway in the middle of the screen which
@@ -295,6 +305,14 @@ public class Oogway implements Cloneable, OConstants {
 	 */
 	public float distance(float x, float y) {
 		return sqrt(pow((x - xcor), 2) + pow((y - ycor), 2));
+	}
+	
+	/**
+	 * @param o
+	 * @return
+	 */
+	public float distance(Oogway o){
+		return distance(o.xcor(), o.ycor());
 	}
 
 	/**
@@ -926,6 +944,14 @@ public class Oogway implements Cloneable, OConstants {
 		float rotRad = atan2(y - ycor, x - xcor);
 		return degrees(rotRad);
 	}
+	
+	/**
+	 * @param o
+	 * @return
+	 */
+	public float towards(Oogway o){
+		return towards(o.xcor(), o.ycor());
+	}
 
 	/**
 	 * Up.
@@ -950,6 +976,13 @@ public class Oogway implements Cloneable, OConstants {
 	 */
 	public float ycor() {
 		return ycor;
+	}
+	
+	public float angleBetween(Oogway o){
+		PVector v1 = new PVector(PApplet.cos(heading),PApplet.sin(heading));
+		PVector v2 = new PVector(PApplet.cos(o.heading),PApplet.sin(o.heading));
+		
+		return PVector.angleBetween(v1, v2);       
 	}
 	
 }
