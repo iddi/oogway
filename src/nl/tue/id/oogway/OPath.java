@@ -67,7 +67,7 @@ public class OPath {
 	@Override
 	public String toString() {
 		return "Path [applet=" + applet + ", closed=" + closed + ", vertices="
-				+ shape.getVertexCount() + "]";
+				+ getVertexCount(shape) + "]";
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class OPath {
 		if (shape == null || distance < EPSILON)
 			drawable = false;
 		if (shape != null)
-			if (shape.getVertexCount() < 2)
+			if (getVertexCount(shape) < 2)
 				drawable = false;
 
 		if (!drawable) {
@@ -140,8 +140,8 @@ public class OPath {
 		float startx = shape.getVertexX(0);
 		float starty = shape.getVertexY(0);
 
-		float endx = shape.getVertexX(shape.getVertexCount() - 1);
-		float endy = shape.getVertexY(shape.getVertexCount() - 1);
+		float endx = shape.getVertexX(getVertexCount(shape) - 1);
+		float endy = shape.getVertexY(getVertexCount(shape) - 1);
 
 		float d = sqrt(pow(endx - startx, 2) + pow(endy - starty, 2));
 
@@ -198,13 +198,13 @@ public class OPath {
 
 			int count = 0;
 
-			count = s.getVertexCount();
+			count = getVertexCount(s);
 			while (count < 2) {
 				if (s.getChildCount() == 0)
 					break;
 				for (int i = 0; i < s.getChildCount(); i++) {
 					s = s.getChild(i);
-					count = s.getVertexCount();
+					count = getVertexCount(s);
 					if (count >= 2)
 						break;
 				}
@@ -245,6 +245,12 @@ public class OPath {
 		this.headingRad = headingRad;
 		this.reflect = reflect;
 
+	}
+	
+	private int getVertexCount(PShape s){
+		if(s.getFamily()==PShape.PATH || s.getFamily() == PShape.GEOMETRY)
+			return s.getVertexCount();
+		return 0;
 	}
 	
 
