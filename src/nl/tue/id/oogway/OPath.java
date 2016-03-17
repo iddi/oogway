@@ -17,6 +17,8 @@
 
 package nl.tue.id.oogway;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.Hashtable;
 import processing.core.PApplet;
 import static processing.core.PApplet.*;
@@ -24,7 +26,7 @@ import processing.core.PShape;
 
 // TODO: Auto-generated Javadoc
 /**
- * OPath class loads a curve from an SVG file. 
+ * OPath class loads a curve from an SVG file.
  * 
  * @author Jun Hu
  * @author Loe Feijs
@@ -47,7 +49,6 @@ public class OPath {
 	private float headingRad = 0;
 	private int reflect = 1;
 
-
 	/**
 	 * Instantiates a new path.
 	 * 
@@ -66,8 +67,7 @@ public class OPath {
 	 */
 	@Override
 	public String toString() {
-		return "Path [applet=" + applet + ", closed=" + closed + ", vertices="
-				+ getVertexCount(shape) + "]";
+		return "Path [applet=" + applet + ", closed=" + closed + ", vertices=" + vertexCount(shape) + "]";
 	}
 
 	/**
@@ -82,10 +82,9 @@ public class OPath {
 
 		this.applet = applet;
 		if (!loadPath(path)) {
-			System.err
-					.println("Oogway says: Not able to open or parse the svg file. \r\n"
-							+ "            Oogway supports SVG files created with Inkscape and Adobe Illustrator.\r\n "
-							+ "            The SVG file should contain simply one path. No other shapes are supported.");
+			System.err.println("Oogway says: Not able to open or parse the svg file. \r\n"
+					+ "            Oogway supports SVG files created with Inkscape and Adobe Illustrator.\r\n "
+					+ "            The SVG file should contain simply one path. No other shapes are supported.");
 		}
 	}
 
@@ -126,40 +125,37 @@ public class OPath {
 		if (shape == null || distance < EPSILON)
 			drawable = false;
 		if (shape != null)
-			if (getVertexCount(shape) < 2)
+			if (vertexCount(shape) < 2)
 				drawable = false;
 
 		if (!drawable) {
-			System.err
-			.println("Oogway says: The path is not drawable. A straight line is drawn instead.");
-			applet.line(x, y, x + distance * cos(headingRad), y + distance
-					* sin(headingRad));
+			System.err.println("Oogway says: The path is not drawable. A straight line is drawn instead.");
+			applet.line(x, y, x + distance * cos(headingRad), y + distance * sin(headingRad));
 			return;
 		}
 
 		float startx = shape.getVertexX(0);
 		float starty = shape.getVertexY(0);
 
-		float endx = shape.getVertexX(getVertexCount(shape) - 1);
-		float endy = shape.getVertexY(getVertexCount(shape) - 1);
+		float endx = shape.getVertexX(vertexCount(shape) - 1);
+		float endy = shape.getVertexY(vertexCount(shape) - 1);
 
 		float d = sqrt(pow(endx - startx, 2) + pow(endy - starty, 2));
 
 		if (d < EPSILON) {
-			System.err
-					.println("Oogways says: Starting and ending points are too close in the path. ");
+			System.err.println("Oogways says: Starting and ending points are too close in the path. ");
 			return;
 		}
 
 		float s = distance / d;
-		
+
 		applet.pushMatrix();
 		applet.pushStyle();
-		
+
 		applet.translate(x, y);
 		applet.rotate(headingRad);
 		applet.scale(s, s * reflect);
-		applet.strokeWeight(applet.g.strokeWeight/s);
+		applet.strokeWeight(applet.g.strokeWeight / s);
 		applet.rotate(-atan2(endy - starty, endx - startx));
 		applet.translate(-startx, -starty);
 		shape.draw(applet.g);
@@ -184,7 +180,7 @@ public class OPath {
 
 		if (shapes.containsKey(filename)) {
 			s = shapes.get(filename);
-			//System.out.println(filename + "reloaded");
+			// System.out.println(filename + "reloaded");
 		} else {
 
 			try {
@@ -198,13 +194,13 @@ public class OPath {
 
 			int count = 0;
 
-			count = getVertexCount(s);
+			count = vertexCount(s);
 			while (count < 2) {
 				if (s.getChildCount() == 0)
 					break;
 				for (int i = 0; i < s.getChildCount(); i++) {
 					s = s.getChild(i);
-					count = getVertexCount(s);
+					count = vertexCount(s);
 					if (count >= 2)
 						break;
 				}
@@ -212,14 +208,14 @@ public class OPath {
 
 			if (count < 2)
 				return false;
-			
+
 			s.disableStyle();
 
 			shapes.put(filename, s);
 		}
 
 		this.shape = s;
-		
+
 		return true;
 	}
 
@@ -237,8 +233,7 @@ public class OPath {
 	 * @param reflect
 	 *            the reflect
 	 */
-	public void transform(float x, float y, float distance, float headingRad,
-			int reflect) {
+	public void transform(float x, float y, float distance, float headingRad, int reflect) {
 		this.x = x;
 		this.y = y;
 		this.distance = distance;
@@ -246,12 +241,24 @@ public class OPath {
 		this.reflect = reflect;
 
 	}
-	
-	private int getVertexCount(PShape s){
-		if(s.getFamily()==PShape.PATH || s.getFamily() == PShape.GEOMETRY)
-			return s.getVertexCount();
-		return 0;
+
+	private int vertexCount(PShape s) {
+		
+		// a trick here to silent the message "getVertexCount() only works with PATH or GEOMETRY shapes"
+		PrintStream original = System.err;
+
+		System.setErr(new PrintStream(new OutputStream() {
+			public void write(int b) {
+				// DO NOTHING
+			}
+		}));
+
+		// if(s.getFamily() == PShape.PATH || s.getFamily() == PShape.GEOMETRY)
+		int count = s.getVertexCount();
+		System.setErr(original);
+
+		return count;
+
 	}
-	
 
 }
